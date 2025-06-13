@@ -191,7 +191,6 @@ uniform float DSHARP <
 #define mix_m float3x3(BRIGHTNESS,ARTIFACT,ARTIFACT,FRINGING,2.0*SATURATION,0.0,FRINGING,0.0,2.0*SATURATION)
 #define rgb_m float3x3(0.299,0.587,0.114,0.596,-0.274,-0.322,0.211,-0.523,0.312)
 #define yiq_m float3x3(1.000,0.956,0.621,1.000,-0.272,-0.647,1.000,-1.106,1.703)
-#define tex_c texcoord+float2(0.50*OrgSize.z/4.0,0.0)
 #define fetch_offset1(dx)  texCD(PAAL_S02,tex_c+dx).xyz+texCD(PAAL_S02,tex_c-dx).xyz
 #define fetch_offset2(dx) float3(texCD(PAAL_S02,tex_c+dx.xz).x+texCD(PAAL_S02,tex_c-dx.xz).x,texCD(PAAL_S02,tex_c+dx.yz).yz+texCD(PAAL_S02,tex_c-dx.yz).yz)
 
@@ -357,6 +356,7 @@ float4 Signal_2_PS(float4 position:SV_Position,float2 texcoord:TEXCOORD):SV_Targ
 	float res=ntsc_scale;
 	float3 signal=0.0;
 	float2 one=0.25*OrgSize.zz/res;
+	float2 tex_c=texcoord+float2(0.5*OrgSize.z/4.0,0.0);
 	float phase= ( ntsc_phase<1.5)?((OrgSize.x>300.0)?2.0:3.0):((ntsc_phase>2.5)?3.0:2.0);
 	if(ntsc_phase==4.0){phase=3.0;luma_filter_3_phase=luma_filter_4_phase;}
 	float3 wsum =0.0.xxx;
@@ -428,7 +428,7 @@ float4 Signal_3_PS(float4 position:SV_Position,float2 texcoord:TEXCOORD):SV_Targ
 {
 	float2 dx=float2(0.25*OrgSize.z/4.0,0.0);
 	float2 xx=float2(0.50*OrgSize.z,0.0);
-	float2 tcoord=tex_c-2.0*dx;
+	float2 tex_c=texcoord+float2(0.5*OrgSize.z/4.0,0.0);float2 tcoord=tex_c-2.0*dx;
 	float2 tcoorb=(floor(OrgSize.xy*tex_c)+0.5)*OrgSize.zw;
 	float lcoord=OrgSize.x*(tex_c.x+dx.x )-0.5;
 	float fpx=frac(lcoord);
