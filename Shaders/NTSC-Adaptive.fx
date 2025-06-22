@@ -172,7 +172,7 @@ uniform float DREDGE <
 	ui_max = 1.0;
 	ui_step = 0.01;
 	ui_label = "FSharpen - Deblur Edges Falloff";
-> = 0.89;
+> = 0.9;
 
 uniform float DSHARP <
 	ui_type = "drag";
@@ -285,7 +285,7 @@ float4 Signal_1_PS(float4 position:SV_Position,float2 texcoord:TEXCOORD):SV_Targ
 	mit=swoothstep(16.0,8.0,mit)*0.325;
 	if(MERGE>0.5)
 	{
-	float chroma_phase2=(phase<2.5)?pii*(mod(pix_no.y,2.0)+mod(framecount+1.0,2.0)):0.6667*pii*(mod(pix_no.y,3.0)+mod(framecount+1.0,2.0));
+	float chroma_phase2=(phase<2.5)?pii*(mod(pix_no.y,2.0)+mod(float(framecount)+1,2.)):0.6667*pii*(mod(pix_no.y,3.0)+mod(float(framecount)+1,2.));
 	float mod_phase2=chroma_phase2+pix_no.x*CHROMA_MOD_FREQ;
 	float i_mod2=cos( mod_phase2 );
 	float q_mod2=sin( mod_phase2 );
@@ -302,7 +302,7 @@ float4 Signal_1_PS(float4 position:SV_Position,float2 texcoord:TEXCOORD):SV_Targ
 	yiq2.x=dot(yiqs,mix_m[0]);
 	}
 	}
-	float chroma_phase1=(phase<2.5)?pii*(mod(pix_no.y,2.0)+mod(framecount    ,2.0)):0.6667*pii*(mod(pix_no.y,3.0)+mod(framecount    ,2.0));
+	float chroma_phase1=(phase<2.5)?pii*(mod(pix_no.y,2.0)+mod(float(framecount)  ,2.)):0.6667*pii*(mod(pix_no.y,3.0)+mod(float(framecount)  ,2.));
 	float mod_phase1=chroma_phase1+pix_no.x*CHROMA_MOD_FREQ;
 	float i_mod1=cos( mod_phase1 );
 	float q_mod1=sin( mod_phase1 );
@@ -525,10 +525,8 @@ float4 SharpnessPS(float4 position:SV_Position,float2 texcoord:TEXCOORD):SV_Targ
 	float l11=get_luma(texCD(PAAL_S01,toxcoord        ).rgb);
 	float d11=min(min(l01,l21),l11);
 	l11=max(max(l01,l21),l11);
-	float lmn=get_luma(nim);
-	float lmx=get_luma(xam);
-	float ln1=min(lerp(d11,lmn,lmn),lmn);
-	float lx1=max(lerp(lmx,l11,lmx),lmx);
+	float lmn=min(min(get_luma(c01),get_luma(c21)),get_luma(c11));float ln1=min(lerp(d11,lmn,lmn),lmn);
+	float lmx=max(max(get_luma(c01),get_luma(c21)),get_luma(c11));float lx1=max(lerp(lmx,l11,lmx),lmx);
 	float r11=get_luma(res);
 	float di1=max((r11-ln1),0.0)+0.00001;di1=pow(di1,DEBLUR);
 	float di2=max((lx1-r11),0.0)+0.00001;di2=pow(di2,DEBLUR);
